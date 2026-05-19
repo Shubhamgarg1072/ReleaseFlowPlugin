@@ -54,19 +54,41 @@ data class EnvironmentConfig(
     var slackWebhook: String = ""
 ) {
     /**
-     * Extracts the Drive folder ID from [driveFolderUrl].
+     * Identifies which cloud provider [driveFolderUrl] points to, by URL pattern.
+     */
+    enum class CloudProvider { GOOGLE_DRIVE, ONE_DRIVE, UNKNOWN }
+
+    /**
+     * Detects the cloud storage provider from [driveFolderUrl].
+     *
+     * - Google Drive: URL contains `drive.google.com`, or bare folder ID without dots
+     * - OneDrive: URL contains `1drv.ms`, `onedrive.live.com`, or `sharepoint.com`
+     */
+    fun cloudProvider(): CloudProvider = when {
+        driveFolderUrl.isBlank() -> CloudProvider.UNKNOWN
+        driveFolderUrl.contains("drive.google.com") -> CloudProvider.GOOGLE_DRIVE
+        driveFolderUrl.contains("1drv.ms") ||
+            driveFolderUrl.contains("onedrive.live.com") ||
+            driveFolderUrl.contains("sharepoint.com") -> CloudProvider.ONE_DRIVE
+        // Bare Google Drive folder ID (alphanumeric, no domain)
+        !driveFolderUrl.contains(".") && driveFolderUrl.matches(Regex("[a-zA-Z0-9_-]+")) -> CloudProvider.GOOGLE_DRIVE
+        else -> CloudProvider.UNKNOWN
+    }
+
+    /**
+     * Extracts the Google Drive folder ID from [driveFolderUrl].
+     * Returns null if the URL is not a Google Drive URL.
      *
      * Accepts URLs like:
      * - `https://drive.google.com/drive/folders/1abc123xyz`
      * - `https://drive.google.com/drive/folders/1abc123xyz?usp=sharing`
      * - `https://drive.google.com/drive/u/0/folders/1abc123xyz`
-     * - just the bare ID: `1abc123xyz`
+     * - bare folder ID: `1abc123xyz`
      */
     fun driveFolderId(): String? {
-        if (driveFolderUrl.isBlank()) return null
+        if (cloudProvider() != CloudProvider.GOOGLE_DRIVE) return null
         val match = Regex("/folders/([a-zA-Z0-9_-]+)").find(driveFolderUrl)
         if (match != null) return match.groupValues[1]
-        // Treat as a bare folder ID if no slashes
         return if (!driveFolderUrl.contains("/") && driveFolderUrl.matches(Regex("[a-zA-Z0-9_-]+"))) {
             driveFolderUrl
         } else null
@@ -82,15 +104,32 @@ data class EnvironmentConfig(
             errors += "environment('$name'): buildType must not be blank (e.g. \"debug\" or \"release\")"
         }
 
-        // Drive validation
-        if (driveFolderUrl.isNotBlank() && driveFolderId() == null) {
-            errors += """
-                |environment('$name'): driveFolderUrl is not a valid Drive folder URL
-                |  Got: '$driveFolderUrl'
-                |  → Open the folder in Google Drive in your browser
-                |  → Copy the URL from the address bar (it contains "/folders/<id>")
-                |  → Paste it as: driveFolderUrl = "https://drive.google.com/drive/folders/<id>"
-            """.trimMargin()
+        // Drive validation — detect which cloud provider and validate accordingly
+        if (driveFolderUrl.isNotBlank()) {
+            when (cloudProvider()) {
+                CloudProvider.UNKNOWN -> errors += """
+                    |environment('$name'): driveFolderUrl is not a recognized cloud folder URL
+                    |  Got: '$driveFolderUrl'
+                    |  Supported formats:
+                    |    Google Drive: https://drive.google.com/drive/folders/<id>
+                    |    OneDrive:     https://1drv.ms/f/<id> or https://onedrive.live.com/?... or SharePoint URL
+                    |  → Open the folder in your browser, copy the URL from the address bar, and paste it here
+                """.trimMargin()
+                CloudProvider.GOOGLE_DRIVE -> {
+                    if (driveFolderId() == null) {
+                        errors += """
+                            |environment('$name'): Google Drive URL is malformed
+                            |  Got: '$driveFolderUrl'
+                            |  → The URL must contain '/folders/<id>'
+                            |  → Example: https://drive.google.com/drive/folders/1abc123xyz
+                        """.trimMargin()
+                    }
+                }
+                CloudProvider.ONE_DRIVE -> {
+                    // OneDrive URLs vary widely (1drv.ms shortlinks, onedrive.live.com, SharePoint),
+                    // and we use the full URL with Graph's /shares endpoint, so no further parsing required.
+                }
+            }
         }
 
         if (driveServiceAccountJson.isNotBlank()) {

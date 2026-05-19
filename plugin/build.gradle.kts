@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.github.Shubhamgarg1072"
-version = "1.1.0"
+version = "1.2.0"
 
 kotlin {
     jvmToolchain(17)
@@ -23,10 +23,16 @@ gradlePlugin {
 }
 
 dependencies {
+    // Google Drive (OAuth + Service Account)
     implementation("com.google.api-client:google-api-client:2.2.0")
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
     implementation("com.google.apis:google-api-services-drive:v3-rev20230822-2.0.0")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.20.0")
+
+    // Microsoft OneDrive (MSAL OAuth + Graph REST API)
+    implementation("com.microsoft.azure:msal4j:1.14.3")
+
+    // Email (SMTP fallback) + YAML config
     implementation("com.sun.mail:jakarta.mail:2.0.1")
     implementation("org.yaml:snakeyaml:2.2")
 

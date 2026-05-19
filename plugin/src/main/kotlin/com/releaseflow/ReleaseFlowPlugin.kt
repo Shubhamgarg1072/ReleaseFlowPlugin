@@ -1,7 +1,9 @@
 package com.releaseflow
 
 import com.releaseflow.tasks.ReleaseFlowDeployTask
+import com.releaseflow.tasks.ReleaseFlowLoginOneDriveTask
 import com.releaseflow.tasks.ReleaseFlowLoginTask
+import com.releaseflow.tasks.ReleaseFlowLogoutOneDriveTask
 import com.releaseflow.tasks.ReleaseFlowLogoutTask
 import com.releaseflow.tasks.ReleaseFlowValidateTask
 import org.gradle.api.Plugin
@@ -30,7 +32,7 @@ class ReleaseFlowPlugin : Plugin<Project> {
             task.projectRootDir = project.rootDir
         }
 
-        // Register login/logout tasks — no DSL config needed
+        // === Google Drive sign-in tasks ===
         project.tasks.register("releaseFlowLogin", ReleaseFlowLoginTask::class.java) { task ->
             task.group = "release"
             task.description = "One-time Google Drive sign-in (opens browser)"
@@ -40,7 +42,19 @@ class ReleaseFlowPlugin : Plugin<Project> {
         }
         project.tasks.register("releaseFlowLogout", ReleaseFlowLogoutTask::class.java) { task ->
             task.group = "release"
-            task.description = "Clear the cached Drive OAuth token"
+            task.description = "Clear the cached Google Drive OAuth token"
+        }
+
+        // === Microsoft OneDrive sign-in tasks ===
+        project.tasks.register("releaseFlowLoginOneDrive", ReleaseFlowLoginOneDriveTask::class.java) { task ->
+            task.group = "release"
+            task.description = "One-time Microsoft OneDrive sign-in (opens browser)"
+            task.clientIdOverride = project.findProperty("rf.onedrive.clientId")?.toString() ?: ""
+            task.redirectUriOverride = project.findProperty("rf.onedrive.redirectUri")?.toString() ?: ""
+        }
+        project.tasks.register("releaseFlowLogoutOneDrive", ReleaseFlowLogoutOneDriveTask::class.java) { task ->
+            task.group = "release"
+            task.description = "Clear the cached OneDrive OAuth token"
         }
 
         // After DSL evaluation: read YAML (if present), merge, register per-env deploy tasks

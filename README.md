@@ -1,31 +1,48 @@
 # ReleaseFlow — Android Release Automation Plugin
 
-> One Gradle task. Full release pipeline. **Zero credentials to manage.**
+> One Gradle task. Full release pipeline. **Zero credentials to manage. 100% free.**
 
 ReleaseFlow automates everything between "build approved" and "QA has the APK link in their inbox":
-**build → rename → upload to Drive → open Gmail compose → done.**
+**build → rename → upload to Google Drive OR OneDrive → open Gmail compose → done.**
 
 [![Plugin](https://img.shields.io/badge/Gradle%20Plugin-com.releaseflow.gradle-blue)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/packages)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.1.0-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
+[![Version](https://img.shields.io/badge/Version-1.2.0-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
+
+---
+
+## 💯 Everything is free
+
+| Component                | Free tier                                            |
+|--------------------------|------------------------------------------------------|
+| Google Drive storage     | **15 GB** per personal Google account                |
+| OneDrive storage         | **5 GB** per free Microsoft account (more on M365)   |
+| Google Drive API calls   | Free (no quota concerns for release automation)      |
+| Microsoft Graph API calls| Free                                                 |
+| All libraries used       | Open source (Apache 2.0, MIT)                       |
+| OAuth client setup       | Free in both Google Cloud Console and Azure Portal  |
+| Email sending            | Uses your own Gmail account (no third-party service) |
+
+**No subscriptions. No paid APIs. No credit card needed anywhere.**
 
 ---
 
 ## The 3-step setup
 
 ```bash
-# 1. Sign in to Google Drive once (opens browser)
-./gradlew releaseFlowLogin
+# 1. Sign in once (opens browser — pick Google or OneDrive)
+./gradlew releaseFlowLogin            # for Google Drive
+# OR
+./gradlew releaseFlowLoginOneDrive    # for OneDrive
 
-# 2. Paste a Drive folder URL in your build.gradle.kts
-#    (see config example below)
+# 2. Paste a folder URL in build.gradle.kts
+#    (works with any Drive or OneDrive folder you have access to)
 
 # 3. Ship it
 ./gradlew releaseFlowDeployQa
 ```
 
-**That's it.** No service account JSON. No Gmail App Passwords. No folder sharing.
-Just sign in once → paste folder URL → run deploy.
+That's it. No service-account JSON. No App Passwords. No folder sharing.
 
 ---
 
@@ -35,7 +52,7 @@ When you run `./gradlew releaseFlowDeployQa`:
 
 1. **Builds** the APK / AAB (`assembleQaDebug`)
 2. **Renames** it with a timestamp — `qa-debug-20250519-1430.apk`
-3. **Uploads** it to Drive in a `Project / Env / Year / Month` subfolder
+3. **Uploads** it to Google Drive or OneDrive (auto-detected from the folder URL) in a `Project / Env / Year / Month` subfolder
 4. **Opens Gmail compose** in your browser with subject, recipients, download link, and changelog already filled in
 5. **You click Send.** Done.
 
@@ -47,7 +64,8 @@ The pipeline also generates a changelog from git commits since the last tag.
 
 - [Installation](#installation)
 - [Configure your environments](#configure-your-environments)
-- [How the OAuth login works](#how-the-oauth-login-works)
+- [Google Drive vs OneDrive — which to use?](#google-drive-vs-onedrive--which-to-use)
+- [How the sign-in flow works](#how-the-sign-in-flow-works)
 - [How the email works](#how-the-email-works)
 - [Usage commands](#usage-commands)
 - [YAML config (optional)](#yaml-config-optional)
@@ -89,51 +107,46 @@ gpr.user=YOUR_GITHUB_USERNAME
 gpr.token=YOUR_GITHUB_TOKEN
 ```
 
-The token needs only the **`read:packages`** scope.
-Generate at: **GitHub → Settings → Developer settings → Personal access tokens (classic)**
+The token needs only the **`read:packages`** scope (free at GitHub → Settings → Developer settings → PATs).
 
 ### Step 3 — Apply the plugin in `app/build.gradle.kts`
 
 ```kotlin
 plugins {
     id("com.android.application")
-    id("com.releaseflow.gradle") version "1.1.0"
+    id("com.releaseflow.gradle") version "1.2.0"
 }
 ```
-
-That's the install. Now configure your environments and sign in.
 
 ---
 
 ## Configure your environments
 
-In `app/build.gradle.kts`:
+Just paste folder URLs — the plugin auto-detects whether each is Google Drive or OneDrive.
 
 ```kotlin
 releaseFlow {
     projectName = "MyApp"
 
+    // Google Drive example
     environment("qa") {
         flavor    = "qa"
         buildType = "debug"
-
-        // 👇 Just paste a Drive folder URL. Copy it from your browser address bar.
         driveFolderUrl = "https://drive.google.com/drive/folders/1abc123XYZ"
-
-        // 👇 Recipients. Gmail compose opens with these already in the To: field.
         emailTo = listOf("qa@company.com", "lead@company.com")
-
         changelogEnabled = true
     }
 
+    // OneDrive example — same field, different URL
     environment("staging") {
         flavor    = "staging"
         buildType = "release"
-        driveFolderUrl = "https://drive.google.com/drive/folders/1xyz456ABC"
+        driveFolderUrl = "https://1drv.ms/f/s!ABC123xyz"
         emailTo = listOf("staging@company.com")
         changelogEnabled = true
     }
 
+    // Mix and match per environment
     environment("production") {
         flavor    = "prod"
         buildType = "release"
@@ -145,31 +158,58 @@ releaseFlow {
 }
 ```
 
-**That's the whole config.** No SMTP host, no usernames, no passwords, no JSON files.
-
-> 📁 **How to get the folder URL:** Open the target folder in Google Drive (in your browser). The address bar shows `https://drive.google.com/drive/folders/<long-id>?usp=sharing`. Copy the whole URL.
+> 📁 **How to get the folder URL:** Open the target folder in Google Drive or OneDrive (in your browser). Copy the URL from the address bar — that's it. Both providers accept share links and direct URLs.
 
 ---
 
-## How the OAuth login works
+## Google Drive vs OneDrive — which to use?
+
+Both work identically from a plugin-user perspective. Pick based on what your company already uses:
+
+| Feature                  | Google Drive                           | OneDrive                                        |
+|--------------------------|----------------------------------------|-------------------------------------------------|
+| Free storage             | 15 GB                                  | 5 GB (personal) / 1 TB+ (Microsoft 365)         |
+| Sign-in task             | `./gradlew releaseFlowLogin`           | `./gradlew releaseFlowLoginOneDrive`            |
+| Folder URL format        | `drive.google.com/drive/folders/<id>`  | `1drv.ms/f/...`, `onedrive.live.com`, SharePoint |
+| Works for personal use   | ✅ Free Google account                 | ✅ Free outlook.com / hotmail.com / live.com    |
+| Works for business use   | ✅ Google Workspace                    | ✅ Microsoft 365 + SharePoint                   |
+| Anonymous download links | ✅                                     | ✅                                              |
+| CI-friendly fallback     | Service Account JSON                   | (use OAuth refresh token from CI machine)       |
+
+You can mix providers across environments — e.g. QA on OneDrive, Production on Google Drive.
+
+---
+
+## How the sign-in flow works
 
 The first time you (or any teammate) wants to use ReleaseFlow on a machine:
+
+### For Google Drive folders
 
 ```bash
 ./gradlew releaseFlowLogin
 ```
 
-This will:
+Opens your browser → sign in with any Google account → grant Drive access → token saved to `~/.releaseflow/StoredCredential`. **One time per machine, per cloud account.**
 
-1. Open your default browser to Google's sign-in page
-2. Ask you to choose a Google account and grant Drive access
-3. Save a refresh token to `~/.releaseflow/StoredCredential` on your machine
-4. Use that token automatically for every future deploy — **no need to sign in again**
+### For OneDrive folders
 
-To switch accounts: `./gradlew releaseFlowLogout` then `./gradlew releaseFlowLogin`.
+```bash
+./gradlew releaseFlowLoginOneDrive
+```
 
-> 🔒 **What permissions does the plugin request?**
-> Only `drive.file` scope — it can read/write **only the files it creates**. It can't see your other Drive files.
+Opens your browser → sign in with any Microsoft account (personal or work) → grant Files.ReadWrite → token saved to `~/.releaseflow/onedrive-token-cache.json`.
+
+### Sign out / switch accounts
+
+```bash
+./gradlew releaseFlowLogout            # clears Google Drive token
+./gradlew releaseFlowLogoutOneDrive    # clears OneDrive token
+```
+
+> 🔒 **Permissions requested:**
+> - **Google Drive:** `drive.file` scope only — can read/write **only files it creates**, not your other Drive files.
+> - **OneDrive:** `Files.ReadWrite` — required for uploads and creating share links.
 
 ---
 
@@ -179,13 +219,11 @@ When the pipeline reaches the email step, it builds a Gmail compose URL with:
 
 - **To:** all recipients you listed
 - **Subject:** `[MyApp] New QA build — qa-debug-20250519-1430.apk`
-- **Body:** download link, Drive folder path, changelog, all pre-filled
+- **Body:** download link, folder path, changelog, all pre-filled
 
-…then opens that URL in your default browser. Gmail loads with a new draft already populated.
+…then opens that URL in your default browser. Gmail loads with a draft already populated. **You review. You click Send.**
 
-**You review it. You click Send. Done.**
-
-No App Passwords, no SMTP credentials, no "less secure apps" toggles.
+No App Passwords, no SMTP, no Microsoft Exchange auth. Just one click.
 
 ### Example email body
 
@@ -213,18 +251,20 @@ Folder: My Builds/MyApp/qa/2025/May
 — Sent by ReleaseFlow
 ```
 
-> 💡 **For CI/automated runs**, switch any environment to `emailMode = "smtp"` and provide credentials. See [Headless CI mode](#headless-ci-mode) below.
+> 💡 For CI/automated runs, switch any environment to `emailMode = "smtp"` and provide credentials. See [Headless CI mode](#headless-ci-mode).
 
 ---
 
 ## Usage commands
 
 ```bash
-# One-time browser sign-in (Drive)
-./gradlew releaseFlowLogin
+# One-time browser sign-in (pick one based on the folder you're using)
+./gradlew releaseFlowLogin              # Google Drive
+./gradlew releaseFlowLoginOneDrive      # OneDrive
 
 # Sign out / switch accounts
 ./gradlew releaseFlowLogout
+./gradlew releaseFlowLogoutOneDrive
 
 # Deploy
 ./gradlew releaseFlowDeployQa
@@ -240,7 +280,7 @@ Folder: My Builds/MyApp/qa/2025/May
 # Reuse existing APK, skip the Gradle build step
 ./gradlew releaseFlowDeployQa -PskipBuild=true
 
-# Skip the Drive upload (email-only delivery)
+# Skip the cloud upload (email-only delivery)
 ./gradlew releaseFlowDeployQa -PskipUpload=true
 ```
 
@@ -256,8 +296,8 @@ Folder: My Builds/MyApp/qa/2025/May
 ✓ Artifact renamed to: qa-debug-20250519-1430.apk
 ○ Changelog: reading git history
 ✓ Changelog: 12 commit(s)
-○ Upload: qa-debug-20250519-1430.apk → Drive folder 1abc123XYZ
-✓ Uploaded to Drive: My Builds/MyApp/qa/2025/May
+○ Upload: qa-debug-20250519-1430.apk → Google Drive
+✓ Uploaded: My Builds/MyApp/qa/2025/May
 ○ Email: opening Gmail compose in browser for [qa@company.com, lead@company.com]
 ✓ Gmail compose opened in your browser — review and click Send.
 ▶ ReleaseFlow pipeline complete ✓
@@ -283,13 +323,29 @@ environments:
         folder_url: "https://drive.google.com/drive/folders/1abc123XYZ"
     notifications:
       email:
-        mode: browser   # or "smtp" for headless CI
+        mode: browser
         to:
           - qa@company.com
-          - lead@company.com
     changelog:
       enabled: true
       format: plain
+
+  # OneDrive example — same field, just a different URL
+  staging:
+    build:
+      flavor: staging
+      type: release
+    storage:
+      google_drive:
+        folder_url: "https://1drv.ms/f/s!ABC123xyz"   # auto-detected as OneDrive
+    notifications:
+      email:
+        mode: browser
+        to:
+          - staging@company.com
+    changelog:
+      enabled: true
+      format: markdown
 ```
 
 `${VAR_NAME}` placeholders are resolved from environment variables at build time. The DSL `releaseFlow { }` block always wins when both exist.
@@ -300,30 +356,25 @@ environments:
 
 Browser-based login and Gmail compose can't open a browser on a CI runner. For CI:
 
-### CI Drive uploads — use a Service Account
+### CI Drive uploads — use a Service Account (Google Drive)
 
 ```kotlin
 environment("qa") {
     flavor = "qa"
     buildType = "debug"
     driveFolderUrl = "https://drive.google.com/drive/folders/1abc123XYZ"
-
-    // CI-only: point to a Service Account JSON (overrides OAuth token)
-    driveServiceAccountJson = "drive-service-account.json"
-
-    // ...
+    driveServiceAccountJson = "drive-service-account.json"   // CI-only override
 }
 ```
 
-Share the Drive folder with the service account email (`name@project.iam.gserviceaccount.com`) once.
+For OneDrive in CI, copy your locally-generated `~/.releaseflow/onedrive-token-cache.json` to the CI runner as a secret. The refresh token inside renews automatically.
 
 ### CI email — use SMTP
 
 ```kotlin
 environment("qa") {
-    // ...
     emailTo = listOf("qa@company.com")
-    emailMode = "smtp"      // ← switch from default "browser"
+    emailMode = "smtp"
     emailUsername = System.getenv("RF_EMAIL_USER") ?: ""
     emailPassword = System.getenv("RF_EMAIL_PASS") ?: ""   // Gmail App Password
 }
@@ -335,15 +386,13 @@ Add `RF_EMAIL_USER` and `RF_EMAIL_PASS` as repo secrets in your CI provider.
 
 ## Local development
 
-The `sample-app/` module uses `includeBuild("../")` — you can develop and test the plugin without publishing:
+The `sample-app/` module uses `includeBuild("../")` — develop and test the plugin without publishing:
 
 ```bash
 cd sample-app
 ../gradlew releaseFlowValidate
 ../gradlew releaseFlowDeployQa -PdryRun=true
 ```
-
-The local plugin source compiles and runs in-place. No publish step needed during development.
 
 ---
 
@@ -352,27 +401,32 @@ The local plugin source compiles and runs in-place. No publish step needed durin
 ```bash
 # 1. Bump version in gradle.properties and plugin/build.gradle.kts
 # 2. Commit and tag
-git commit -am "chore: bump version to v1.2.0"
-git tag v1.2.0
+git commit -am "chore: bump version to v1.3.0"
+git tag v1.3.0
 git push origin main --tags
 ```
 
 GitHub Actions (`.github/workflows/publish.yml`) auto-publishes to GitHub Packages on every `v*` tag.
 
-### OAuth client setup (one-time, for maintainers only)
+### OAuth client setup (one-time per cloud provider, free)
 
-The plugin ships with a pre-configured OAuth Client ID so end users never see Google Cloud setup. If you're forking the plugin, you'll need to create your own OAuth client once:
+The plugin ships with pre-configured OAuth Client IDs so end users never see cloud-portal setup. If you're forking the plugin, create your own free clients once:
 
+**For Google Drive (free):**
 1. [console.cloud.google.com](https://console.cloud.google.com) → APIs & Services → Credentials
 2. **Create Credentials → OAuth Client ID → Application type: Desktop App**
-3. Enable the **Google Drive API** for your project
-4. Copy the Client ID and Secret into `OAuthDriveUploader.kt`:
-   ```kotlin
-   const val DEFAULT_CLIENT_ID = "your-id.apps.googleusercontent.com"
-   const val DEFAULT_CLIENT_SECRET = "your-secret"
-   ```
+3. Enable the **Google Drive API** in your project
+4. Copy values into `OAuthDriveUploader.kt`
 
-> Per [Google's OAuth docs](https://developers.google.com/identity/protocols/oauth2/native-app), the client secret for Desktop App OAuth clients is not actually secret and can ship with the plugin.
+**For OneDrive (free):**
+1. [portal.azure.com](https://portal.azure.com) → Azure Active Directory → App registrations
+2. **New registration** → Supported account types: **Personal Microsoft accounts and any Azure AD directory**
+3. Redirect URI: **Public client/native (mobile & desktop)** → `http://localhost:8989`
+4. API permissions → Add → Microsoft Graph → Delegated → `Files.ReadWrite`, `offline_access`
+5. Copy the **Application (client) ID** into `OneDriveUploader.kt`
+
+> Both portals are completely free. No subscription, no billing setup required.
+> Per [Google](https://developers.google.com/identity/protocols/oauth2/native-app) and [Microsoft](https://learn.microsoft.com/en-us/entra/identity-platform/msal-client-application-configuration), the credentials for Desktop App OAuth clients are not actually secret and can ship with the plugin.
 
 ---
 
@@ -380,38 +434,41 @@ The plugin ships with a pre-configured OAuth Client ID so end users never see Go
 
 ```
 releaseflow-plugin/
-├── plugin/                          ← the Gradle plugin source
+├── plugin/
 │   └── src/main/kotlin/com/releaseflow/
-│       ├── ReleaseFlowPlugin.kt           ← Plugin<Project> entry point
-│       ├── ReleaseFlowExtension.kt        ← DSL: environment("qa") { ... }
-│       ├── EnvironmentConfig.kt           ← config + driveFolderId() parser
-│       ├── YamlConfigReader.kt            ← releaseflow.yaml parser
+│       ├── ReleaseFlowPlugin.kt            ← Plugin<Project> entry point
+│       ├── ReleaseFlowExtension.kt         ← DSL: environment("qa") { ... }
+│       ├── EnvironmentConfig.kt            ← config + cloud provider auto-detection
+│       ├── YamlConfigReader.kt
 │       ├── tasks/
-│       │   ├── ReleaseFlowLoginTask.kt    ← one-time browser sign-in
-│       │   ├── ReleaseFlowLogoutTask.kt   ← clear cached token
-│       │   ├── ReleaseFlowDeployTask.kt   ← per-environment deploy
-│       │   └── ReleaseFlowValidateTask.kt ← config validation
+│       │   ├── ReleaseFlowLoginTask.kt         ← Google Drive sign-in
+│       │   ├── ReleaseFlowLogoutTask.kt
+│       │   ├── ReleaseFlowLoginOneDriveTask.kt ← OneDrive sign-in
+│       │   ├── ReleaseFlowLogoutOneDriveTask.kt
+│       │   ├── ReleaseFlowDeployTask.kt
+│       │   └── ReleaseFlowValidateTask.kt
 │       ├── pipeline/
-│       │   ├── ReleasePipeline.kt         ← orchestrates all steps
-│       │   ├── StepResult.kt              ← Success / Skipped / Failure
+│       │   ├── ReleasePipeline.kt
+│       │   ├── StepResult.kt
 │       │   └── steps/
-│       │       ├── BuildStep.kt           ← runs ./gradlew assemble*
-│       │       ├── ArtifactStep.kt        ← find + timestamp-rename APK/AAB
-│       │       ├── ChangelogStep.kt       ← git log since last tag
-│       │       ├── UploadStep.kt          ← picks OAuth vs Service Account
-│       │       └── NotifyStep.kt          ← picks browser vs SMTP email
+│       │       ├── BuildStep.kt
+│       │       ├── ArtifactStep.kt
+│       │       ├── ChangelogStep.kt
+│       │       ├── UploadStep.kt           ← dispatches to Google or OneDrive
+│       │       └── NotifyStep.kt           ← picks browser vs SMTP email
 │       ├── storage/
-│       │   ├── OAuthDriveUploader.kt      ← OAuth user token (default)
-│       │   └── DriveUploader.kt           ← Service Account (CI fallback)
+│       │   ├── OAuthDriveUploader.kt       ← Google Drive OAuth user token
+│       │   ├── DriveUploader.kt            ← Google Service Account (CI fallback)
+│       │   └── OneDriveUploader.kt         ← Microsoft Graph + MSAL
 │       ├── notify/
-│       │   ├── BrowserEmailSender.kt      ← opens Gmail compose (default)
-│       │   ├── EmailSender.kt             ← JavaMail SMTP (CI fallback)
-│       │   └── EmailTemplate.kt           ← HTML + plain-text templates
+│       │   ├── BrowserEmailSender.kt       ← opens Gmail compose (default)
+│       │   ├── EmailSender.kt              ← JavaMail SMTP (CI fallback)
+│       │   └── EmailTemplate.kt
 │       └── util/
-│           ├── Logger.kt                  ← ANSI colored terminal output
-│           └── Shell.kt                   ← ProcessBuilder wrapper
-├── sample-app/                      ← demo project (composite build)
-├── .github/workflows/publish.yml    ← auto-publish on v* tag
+│           ├── Logger.kt
+│           └── Shell.kt
+├── sample-app/
+├── .github/workflows/publish.yml
 └── README.md
 ```
 
