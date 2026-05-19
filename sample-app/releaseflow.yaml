@@ -1,0 +1,71 @@
+# ReleaseFlow YAML config — an alternative to the Gradle DSL.
+# If both exist, the DSL block in build.gradle.kts takes precedence.
+# ${VAR_NAME} placeholders are resolved from environment variables at runtime.
+
+project:
+  name: SampleApp
+
+environments:
+  qa:
+    build:
+      flavor: qa
+      type: debug
+    storage:
+      google_drive:
+        root_folder: "QA Builds"
+        credentials_file: drive-credentials.json
+    notifications:
+      email:
+        to:
+          - qa@example.com
+          - lead@example.com
+        smtp_host: smtp.gmail.com
+        smtp_port: 587
+        username: ${RF_EMAIL_USER}
+        password: ${RF_EMAIL_PASS}
+      slack_webhook: ${RF_SLACK_WEBHOOK}
+    changelog:
+      enabled: true
+      format: plain
+
+  staging:
+    build:
+      flavor: staging
+      type: release
+    storage:
+      google_drive:
+        root_folder: "Staging Builds"
+        credentials_file: drive-credentials.json
+    notifications:
+      email:
+        to:
+          - staging@example.com
+        smtp_host: smtp.gmail.com
+        smtp_port: 587
+        username: ${RF_EMAIL_USER}
+        password: ${RF_EMAIL_PASS}
+    changelog:
+      enabled: true
+      format: markdown
+
+  production:
+    build:
+      flavor: prod
+      type: release
+    storage:
+      google_drive:
+        root_folder: "Production Builds"
+        credentials_file: drive-credentials.json
+    notifications:
+      email:
+        to:
+          - releases@example.com
+          - cto@example.com
+        smtp_host: smtp.gmail.com
+        smtp_port: 587
+        username: ${RF_EMAIL_USER}
+        password: ${RF_EMAIL_PASS}
+      slack_webhook: ${RF_SLACK_WEBHOOK}
+    changelog:
+      enabled: true
+      format: markdown
