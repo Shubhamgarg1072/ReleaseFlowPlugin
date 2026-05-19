@@ -7,7 +7,7 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 [![Plugin](https://img.shields.io/badge/Gradle%20Plugin-com.releaseflow.gradle-blue)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/packages)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.4.0-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
+[![Version](https://img.shields.io/badge/Version-1.4.1-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
 
 ---
 
@@ -83,7 +83,7 @@ Just **one line** in `app/build.gradle.kts`:
 ```kotlin
 plugins {
     id("com.android.application")
-    id("com.releaseflow.gradle") version "1.4.0"
+    id("com.releaseflow.gradle") version "1.4.1"
 }
 ```
 
@@ -380,8 +380,8 @@ cd sample-app
 ```bash
 # 1. Bump version in gradle.properties and plugin/build.gradle.kts
 # 2. Commit and tag
-git commit -am "chore: bump version to v1.4.0"
-git tag v1.4.0
+git commit -am "chore: bump version to v1.4.1"
+git tag v1.4.1
 git push origin main --tags
 ```
 

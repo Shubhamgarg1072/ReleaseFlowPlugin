@@ -5,8 +5,8 @@ plugins {
     id("com.gradle.plugin-publish") version "1.2.1"
 }
 
-group = "com.github.Shubhamgarg1072"
-version = "1.4.0"
+group = "com.releaseflow"
+version = "1.4.1"
 
 kotlin {
     jvmToolchain(17)
