@@ -110,6 +110,27 @@ class EnvironmentConfigTest {
     }
 
     @Test
+    fun `cc and bcc default to empty lists`() {
+        val config = EnvironmentConfig(name = "qa")
+        assertTrue("emailCc should default empty", config.emailCc.isEmpty())
+        assertTrue("emailBcc should default empty", config.emailBcc.isEmpty())
+    }
+
+    @Test
+    fun `validate passes with To Cc Bcc all populated in browser mode`() {
+        val config = EnvironmentConfig(
+            name = "qa",
+            buildType = "debug",
+            emailTo = listOf("qa@company.com"),
+            emailCc = listOf("pm@company.com", "design@company.com"),
+            emailBcc = listOf("archive@company.com"),
+            emailMode = "browser"
+        )
+        val errors = config.validate(tempDir.root)
+        assertTrue("CC/BCC should not require credentials in browser mode, got: $errors", errors.isEmpty())
+    }
+
+    @Test
     fun `validate fails for smtp mode without credentials`() {
         val config = EnvironmentConfig(
             name = "qa",

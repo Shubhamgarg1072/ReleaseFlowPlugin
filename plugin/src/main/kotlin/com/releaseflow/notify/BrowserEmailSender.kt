@@ -28,13 +28,20 @@ class BrowserEmailSender {
         artifact: File?,
         uploadResult: UploadResult?,
         changelog: List<String>,
-        recipients: List<String>
+        recipients: List<String>,
+        cc: List<String> = emptyList(),
+        bcc: List<String> = emptyList()
     ) {
-        val to = recipients.joinToString(",")
         val subject = "[$projectName] New ${envName.uppercase()} build — ${artifact?.name ?: "release"}"
         val body = buildBody(projectName, envName, artifact, uploadResult, changelog)
 
-        val gmailUrl = buildGmailComposeUrl(to, subject, body)
+        val gmailUrl = buildGmailComposeUrl(
+            to = recipients.joinToString(","),
+            cc = cc.joinToString(","),
+            bcc = bcc.joinToString(","),
+            subject = subject,
+            body = body
+        )
 
         if (openInBrowser(gmailUrl)) {
             Logger.ok("Gmail compose opened in your browser — review and click Send.")
@@ -83,14 +90,20 @@ class BrowserEmailSender {
         return sb.toString()
     }
 
-    private fun buildGmailComposeUrl(to: String, subject: String, body: String): String {
-        val encodedTo = URLEncoder.encode(to, "UTF-8")
-        val encodedSubject = URLEncoder.encode(subject, "UTF-8")
-        val encodedBody = URLEncoder.encode(body, "UTF-8")
-        return "https://mail.google.com/mail/?view=cm&fs=1" +
-            "&to=$encodedTo" +
-            "&su=$encodedSubject" +
-            "&body=$encodedBody"
+    private fun buildGmailComposeUrl(
+        to: String,
+        cc: String,
+        bcc: String,
+        subject: String,
+        body: String
+    ): String {
+        val sb = StringBuilder("https://mail.google.com/mail/?view=cm&fs=1")
+        sb.append("&to=").append(URLEncoder.encode(to, "UTF-8"))
+        if (cc.isNotBlank()) sb.append("&cc=").append(URLEncoder.encode(cc, "UTF-8"))
+        if (bcc.isNotBlank()) sb.append("&bcc=").append(URLEncoder.encode(bcc, "UTF-8"))
+        sb.append("&su=").append(URLEncoder.encode(subject, "UTF-8"))
+        sb.append("&body=").append(URLEncoder.encode(body, "UTF-8"))
+        return sb.toString()
     }
 
     /**

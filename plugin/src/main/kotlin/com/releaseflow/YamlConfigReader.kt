@@ -77,13 +77,9 @@ object YamlConfigReader {
                 val notifications = envMap["notifications"] as? Map<String, Any>
                 val email = notifications?.get("email") as? Map<String, Any>
                 email?.get("mode")?.toString()?.let { config.emailMode = resolve(it) }
-                email?.get("to")?.let { toRaw ->
-                    config.emailTo = when (toRaw) {
-                        is List<*> -> toRaw.filterNotNull().map { resolve(it.toString()) }
-                        is String -> listOf(resolve(toRaw))
-                        else -> emptyList()
-                    }
-                }
+                email?.get("to")?.let { config.emailTo = parseRecipients(it) }
+                email?.get("cc")?.let { config.emailCc = parseRecipients(it) }
+                email?.get("bcc")?.let { config.emailBcc = parseRecipients(it) }
                 email?.get("smtp_host")?.toString()?.let { config.emailSmtpHost = resolve(it) }
                 email?.get("smtp_port")?.toString()?.let {
                     config.emailSmtpPort = it.toIntOrNull() ?: 587
@@ -111,4 +107,11 @@ object YamlConfigReader {
         envPlaceholderRegex.replace(value) { match ->
             System.getenv(match.groupValues[1]) ?: ""
         }
+
+    /** Accepts either a YAML list (`[a, b]`) or a single string and returns a resolved recipient list. */
+    private fun parseRecipients(raw: Any?): List<String> = when (raw) {
+        is List<*> -> raw.filterNotNull().map { resolve(it.toString()) }
+        is String  -> listOf(resolve(raw))
+        else       -> emptyList()
+    }
 }

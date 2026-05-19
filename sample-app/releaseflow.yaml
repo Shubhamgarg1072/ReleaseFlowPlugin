@@ -23,6 +23,10 @@ environments:
         to:
           - qa@example.com
           - lead@example.com
+        cc:
+          - pm@example.com
+        bcc:
+          - releases-archive@example.com
     changelog:
       enabled: true
       format: plain

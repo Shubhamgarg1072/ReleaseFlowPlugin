@@ -57,6 +57,8 @@ class EmailSender(private val envConfig: EnvironmentConfig) {
         val message = MimeMessage(session).apply {
             setFrom(InternetAddress(envConfig.emailUsername, "$projectName ReleaseFlow"))
             envConfig.emailTo.forEach { addRecipient(Message.RecipientType.TO, InternetAddress(it)) }
+            envConfig.emailCc.forEach { addRecipient(Message.RecipientType.CC, InternetAddress(it)) }
+            envConfig.emailBcc.forEach { addRecipient(Message.RecipientType.BCC, InternetAddress(it)) }
             subject = "[$projectName] New ${envConfig.name.uppercase()} build — ${artifact?.name ?: "release"}"
 
             val plainPart = MimeBodyPart().apply { setText(plainBody, "utf-8") }

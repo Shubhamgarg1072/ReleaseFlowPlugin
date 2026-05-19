@@ -13,6 +13,8 @@ releaseFlow {
         buildType = "debug"
         driveFolderUrl = "https://drive.google.com/drive/folders/REPLACE_WITH_YOUR_GOOGLE_DRIVE_FOLDER_ID"
         emailTo        = listOf("qa@example.com", "lead@example.com")
+        emailCc        = listOf("pm@example.com")               // visible to everyone
+        emailBcc       = listOf("releases-archive@example.com") // hidden from other recipients
         changelogEnabled = true
     }
 

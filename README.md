@@ -7,7 +7,7 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 [![Plugin](https://img.shields.io/badge/Gradle%20Plugin-com.releaseflow.gradle-blue)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/packages)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.2.0-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
+[![Version](https://img.shields.io/badge/Version-1.3.0-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
 
 ---
 
@@ -114,7 +114,7 @@ The token needs only the **`read:packages`** scope (free at GitHub → Settings 
 ```kotlin
 plugins {
     id("com.android.application")
-    id("com.releaseflow.gradle") version "1.2.0"
+    id("com.releaseflow.gradle") version "1.3.0"
 }
 ```
 
@@ -133,7 +133,9 @@ releaseFlow {
         flavor    = "qa"
         buildType = "debug"
         driveFolderUrl = "https://drive.google.com/drive/folders/1abc123XYZ"
-        emailTo = listOf("qa@company.com", "lead@company.com")
+        emailTo  = listOf("qa@company.com", "lead@company.com")
+        emailCc  = listOf("pm@company.com")               // optional — visible to everyone
+        emailBcc = listOf("archive@company.com")          // optional — hidden from other recipients
         changelogEnabled = true
     }
 
@@ -326,6 +328,10 @@ environments:
         mode: browser
         to:
           - qa@company.com
+        cc:
+          - pm@company.com
+        bcc:
+          - archive@company.com
     changelog:
       enabled: true
       format: plain

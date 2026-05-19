@@ -40,10 +40,15 @@ class NotifyStep(
     }
 
     private fun sendBrowser(): StepResult {
-        Logger.step("Email: opening Gmail compose in browser for ${envConfig.emailTo}")
+        val recipientSummary = buildString {
+            append("to=${envConfig.emailTo}")
+            if (envConfig.emailCc.isNotEmpty()) append(", cc=${envConfig.emailCc}")
+            if (envConfig.emailBcc.isNotEmpty()) append(", bcc=${envConfig.emailBcc.size} hidden")
+        }
+        Logger.step("Email: opening Gmail compose in browser ($recipientSummary)")
 
         if (dryRun) {
-            Logger.warn("[DRY RUN] Would open Gmail compose with recipients: ${envConfig.emailTo.joinToString()}")
+            Logger.warn("[DRY RUN] Would open Gmail compose with $recipientSummary")
             return StepResult.Success(Unit)
         }
 
@@ -54,7 +59,9 @@ class NotifyStep(
                 artifact = artifact,
                 uploadResult = uploadResult,
                 changelog = changelog,
-                recipients = envConfig.emailTo
+                recipients = envConfig.emailTo,
+                cc = envConfig.emailCc,
+                bcc = envConfig.emailBcc
             )
             StepResult.Success(Unit)
         } catch (e: Exception) {

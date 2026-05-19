@@ -30,8 +30,14 @@ data class EnvironmentConfig(
     var driveServiceAccountJson: String = "",
 
     // === Email notification ===
-    /** List of recipients. If empty, the email step is skipped. */
+    /** Primary recipients (To: field). If empty, the email step is skipped. */
     var emailTo: List<String> = emptyList(),
+
+    /** Carbon-copy recipients (Cc: field). Visible to all recipients. */
+    var emailCc: List<String> = emptyList(),
+
+    /** Blind carbon-copy recipients (Bcc: field). Hidden from other recipients. */
+    var emailBcc: List<String> = emptyList(),
 
     /**
      * How to send the email:
