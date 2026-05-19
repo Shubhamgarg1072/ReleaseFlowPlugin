@@ -78,38 +78,7 @@ The pipeline also generates a changelog from git commits since the last tag.
 
 ## Installation
 
-### Step 1 — Add the plugin repo to `settings.gradle.kts`
-
-```kotlin
-pluginManagement {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/Shubhamgarg1072/ReleaseFlowPlugin")
-            credentials {
-                username = providers.gradleProperty("gpr.user").orNull
-                    ?: System.getenv("GITHUB_ACTOR") ?: ""
-                password = providers.gradleProperty("gpr.token").orNull
-                    ?: System.getenv("GITHUB_TOKEN") ?: ""
-            }
-        }
-        gradlePluginPortal()
-        google()
-        mavenCentral()
-    }
-}
-```
-
-### Step 2 — Add your GitHub credentials to `~/.gradle/gradle.properties`
-
-```properties
-gpr.user=YOUR_GITHUB_USERNAME
-gpr.token=YOUR_GITHUB_TOKEN
-```
-
-The token needs only the **`read:packages`** scope (free at GitHub → Settings → Developer settings → PATs).
-
-### Step 3 — Apply the plugin in `app/build.gradle.kts`
+Just **one line** in `app/build.gradle.kts`:
 
 ```kotlin
 plugins {
@@ -117,6 +86,10 @@ plugins {
     id("com.releaseflow.gradle") version "1.3.0"
 }
 ```
+
+That's it. No credentials, no maven repo declarations, no PATs. The plugin is hosted on the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.releaseflow.gradle) — `gradlePluginPortal()` is included by default in every Gradle project.
+
+> 💡 **Backup option:** the plugin is also mirrored to GitHub Packages. If you ever need to use the mirror (private fork, etc.), add the GitHub Packages repo to `pluginManagement { repositories { ... } }` with a `read:packages` PAT — but for the official version, Gradle Plugin Portal needs no setup.
 
 ---
 
@@ -407,12 +380,28 @@ cd sample-app
 ```bash
 # 1. Bump version in gradle.properties and plugin/build.gradle.kts
 # 2. Commit and tag
-git commit -am "chore: bump version to v1.3.0"
-git tag v1.3.0
+git commit -am "chore: bump version to v1.4.0"
+git tag v1.4.0
 git push origin main --tags
 ```
 
-GitHub Actions (`.github/workflows/publish.yml`) auto-publishes to GitHub Packages on every `v*` tag.
+GitHub Actions (`.github/workflows/publish.yml`) auto-publishes to:
+- **[Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.releaseflow.gradle)** — the primary, zero-credentials install path for everyone
+- **GitHub Packages** — mirror for private forks or restricted environments
+
+### One-time Plugin Portal setup (maintainer only)
+
+The first publish requires API keys from plugins.gradle.org. The whole process is free:
+
+1. Go to https://plugins.gradle.org/ and **Sign in with GitHub**
+2. Open https://plugins.gradle.org/user/me/api-keys → **Generate API key** (give it a name)
+3. Copy the **key** and **secret** that appear (you only see them once)
+4. In your GitHub repo, go to **Settings → Secrets and variables → Actions → New repository secret** and add:
+   - `GRADLE_PUBLISH_KEY` — the API key
+   - `GRADLE_PUBLISH_SECRET` — the API secret
+5. Push the next `v*` tag — the workflow uses these secrets automatically
+
+> First-time publish of a new plugin id (`com.releaseflow.gradle`) triggers a brief Plugin Portal review (typically a few hours). Subsequent versions of the same plugin publish immediately, with no review.
 
 ### OAuth client setup (one-time per cloud provider, free)
 

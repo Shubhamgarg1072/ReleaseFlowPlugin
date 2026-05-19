@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "1.9.22"
     `java-gradle-plugin`
     `maven-publish`
+    id("com.gradle.plugin-publish") version "1.2.1"
 }
 
 group = "com.github.Shubhamgarg1072"
@@ -12,12 +13,16 @@ kotlin {
 }
 
 gradlePlugin {
+    website.set("https://github.com/Shubhamgarg1072/ReleaseFlowPlugin")
+    vcsUrl.set("https://github.com/Shubhamgarg1072/ReleaseFlowPlugin.git")
+
     plugins {
         create("releaseFlow") {
             id = "com.releaseflow.gradle"
             implementationClass = "com.releaseflow.ReleaseFlowPlugin"
             displayName = "ReleaseFlow"
-            description = "Plug-and-play Android release automation: build → rename → Drive upload → email → changelog"
+            description = "Plug-and-play Android release automation: build → rename → upload to Google Drive or OneDrive → email QA via browser. Zero credentials to manage. OAuth one-time sign-in. Free."
+            tags.set(listOf("android", "release", "automation", "google-drive", "onedrive", "release-management", "ci-cd", "deployment"))
         }
     }
 }
