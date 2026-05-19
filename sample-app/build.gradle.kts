@@ -7,42 +7,37 @@ releaseFlow {
     projectName = "SampleApp"
 
     environment("qa") {
-        flavor          = "qa"
-        buildType       = "debug"
-        driveRootFolder = "QA Builds"
-        driveCredentials = "drive-credentials.json"
-        emailTo         = listOf("qa@example.com", "lead@example.com")
-        emailSmtpHost   = "smtp.gmail.com"
-        emailSmtpPort   = 587
-        emailUsername   = System.getenv("RF_EMAIL_USER") ?: ""
-        emailPassword   = System.getenv("RF_EMAIL_PASS") ?: ""
+        flavor    = "qa"
+        buildType = "debug"
+
+        // Just paste a Drive folder URL — the plugin handles everything else
+        driveFolderUrl = "https://drive.google.com/drive/folders/REPLACE_WITH_YOUR_FOLDER_ID"
+
+        // Zero-config email — opens Gmail compose in browser, you click Send
+        emailTo = listOf("qa@example.com", "lead@example.com")
+
         changelogEnabled = true
-        changelogFormat  = "plain"
-        slackWebhook    = System.getenv("RF_SLACK_WEBHOOK") ?: ""
     }
 
     environment("staging") {
-        flavor          = "staging"
-        buildType       = "release"
-        driveRootFolder = "Staging Builds"
-        driveCredentials = "drive-credentials.json"
-        emailTo         = listOf("staging@example.com")
-        emailUsername   = System.getenv("RF_EMAIL_USER") ?: ""
-        emailPassword   = System.getenv("RF_EMAIL_PASS") ?: ""
+        flavor    = "staging"
+        buildType = "release"
+
+        driveFolderUrl = "https://drive.google.com/drive/folders/REPLACE_WITH_YOUR_FOLDER_ID"
+        emailTo        = listOf("staging@example.com")
+
         changelogEnabled = true
         changelogFormat  = "markdown"
     }
 
     environment("production") {
-        flavor          = "prod"
-        buildType       = "release"
-        driveRootFolder = "Production Builds"
-        driveCredentials = "drive-credentials.json"
-        emailTo         = listOf("releases@example.com", "cto@example.com")
-        emailUsername   = System.getenv("RF_EMAIL_USER") ?: ""
-        emailPassword   = System.getenv("RF_EMAIL_PASS") ?: ""
+        flavor    = "prod"
+        buildType = "release"
+
+        driveFolderUrl = "https://drive.google.com/drive/folders/REPLACE_WITH_YOUR_FOLDER_ID"
+        emailTo        = listOf("releases@example.com", "cto@example.com")
+
         changelogEnabled = true
         changelogFormat  = "markdown"
-        slackWebhook    = System.getenv("RF_SLACK_WEBHOOK") ?: ""
     }
 }

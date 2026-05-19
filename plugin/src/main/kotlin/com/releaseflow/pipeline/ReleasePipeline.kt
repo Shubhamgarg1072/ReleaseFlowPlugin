@@ -63,9 +63,10 @@ class ReleasePipeline(
         }
 
         // Step 3: Upload to Drive
-        val uploadResult = if (skipUpload || envConfig.driveRootFolder.isBlank()) {
-            if (envConfig.driveRootFolder.isBlank()) {
-                Logger.warn("Drive upload skipped — driveRootFolder not configured")
+        val driveConfigured = envConfig.driveFolderUrl.isNotBlank() || envConfig.driveServiceAccountJson.isNotBlank()
+        val uploadResult = if (skipUpload || !driveConfigured) {
+            if (!driveConfigured) {
+                Logger.warn("Drive upload skipped — driveFolderUrl not configured")
             } else {
                 Logger.step("Upload step skipped (--skip-upload)")
             }
@@ -74,7 +75,7 @@ class ReleasePipeline(
             Logger.warn("Drive upload skipped — no artifact found")
             null
         } else {
-            when (val result = UploadStep(envConfig, projectName, artifact, dryRun).execute()) {
+            when (val result = UploadStep(envConfig, projectName, artifact, projectRootDir, dryRun).execute()) {
                 is StepResult.Success<*> -> {
                     Logger.ok("Upload completed")
                     result.value as? com.releaseflow.storage.UploadResult

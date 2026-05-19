@@ -70,12 +70,13 @@ object YamlConfigReader {
                 // Storage / Google Drive
                 val storage = envMap["storage"] as? Map<String, Any>
                 val drive = storage?.get("google_drive") as? Map<String, Any>
-                drive?.get("root_folder")?.toString()?.let { config.driveRootFolder = resolve(it) }
-                drive?.get("credentials_file")?.toString()?.let { config.driveCredentials = resolve(it) }
+                drive?.get("folder_url")?.toString()?.let { config.driveFolderUrl = resolve(it) }
+                drive?.get("service_account_json")?.toString()?.let { config.driveServiceAccountJson = resolve(it) }
 
                 // Notifications / Email
                 val notifications = envMap["notifications"] as? Map<String, Any>
                 val email = notifications?.get("email") as? Map<String, Any>
+                email?.get("mode")?.toString()?.let { config.emailMode = resolve(it) }
                 email?.get("to")?.let { toRaw ->
                     config.emailTo = when (toRaw) {
                         is List<*> -> toRaw.filterNotNull().map { resolve(it.toString()) }

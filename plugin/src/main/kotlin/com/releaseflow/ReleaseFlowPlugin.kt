@@ -1,6 +1,8 @@
 package com.releaseflow
 
 import com.releaseflow.tasks.ReleaseFlowDeployTask
+import com.releaseflow.tasks.ReleaseFlowLoginTask
+import com.releaseflow.tasks.ReleaseFlowLogoutTask
 import com.releaseflow.tasks.ReleaseFlowValidateTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -26,6 +28,19 @@ class ReleaseFlowPlugin : Plugin<Project> {
             task.description = "Validate all ReleaseFlow environment configurations"
             task.extension = extension
             task.projectRootDir = project.rootDir
+        }
+
+        // Register login/logout tasks — no DSL config needed
+        project.tasks.register("releaseFlowLogin", ReleaseFlowLoginTask::class.java) { task ->
+            task.group = "release"
+            task.description = "One-time Google Drive sign-in (opens browser)"
+            task.clientIdOverride = project.findProperty("rf.oauth.clientId")?.toString() ?: ""
+            task.clientSecretOverride = project.findProperty("rf.oauth.clientSecret")?.toString() ?: ""
+            task.port = project.findProperty("rf.oauth.port")?.toString()?.toIntOrNull() ?: 8888
+        }
+        project.tasks.register("releaseFlowLogout", ReleaseFlowLogoutTask::class.java) { task ->
+            task.group = "release"
+            task.description = "Clear the cached Drive OAuth token"
         }
 
         // After DSL evaluation: read YAML (if present), merge, register per-env deploy tasks

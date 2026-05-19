@@ -13,11 +13,8 @@ import org.gradle.api.Project
  *     environment("qa") {
  *         flavor = "qa"
  *         buildType = "debug"
- *         driveRootFolder = "QA Builds"
- *         driveCredentials = "drive-credentials.json"
+ *         driveFolderUrl = "https://drive.google.com/drive/folders/1abc123..."
  *         emailTo = listOf("qa@company.com")
- *         emailUsername = System.getenv("RF_EMAIL_USER") ?: ""
- *         emailPassword = System.getenv("RF_EMAIL_PASS") ?: ""
  *         changelogEnabled = true
  *     }
  * }

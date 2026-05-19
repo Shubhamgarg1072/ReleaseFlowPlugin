@@ -12,18 +12,17 @@ environments:
       type: debug
     storage:
       google_drive:
-        root_folder: "QA Builds"
-        credentials_file: drive-credentials.json
+        # Just paste a Drive folder URL — no service account needed.
+        # First-time setup: ./gradlew releaseFlowLogin
+        folder_url: "https://drive.google.com/drive/folders/REPLACE_WITH_YOUR_FOLDER_ID"
     notifications:
       email:
+        # mode "browser" (default): opens Gmail compose, you click Send. No credentials.
+        # mode "smtp": sends programmatically. Requires username + password.
+        mode: browser
         to:
           - qa@example.com
           - lead@example.com
-        smtp_host: smtp.gmail.com
-        smtp_port: 587
-        username: ${RF_EMAIL_USER}
-        password: ${RF_EMAIL_PASS}
-      slack_webhook: ${RF_SLACK_WEBHOOK}
     changelog:
       enabled: true
       format: plain
@@ -34,16 +33,12 @@ environments:
       type: release
     storage:
       google_drive:
-        root_folder: "Staging Builds"
-        credentials_file: drive-credentials.json
+        folder_url: "https://drive.google.com/drive/folders/REPLACE_WITH_YOUR_FOLDER_ID"
     notifications:
       email:
+        mode: browser
         to:
           - staging@example.com
-        smtp_host: smtp.gmail.com
-        smtp_port: 587
-        username: ${RF_EMAIL_USER}
-        password: ${RF_EMAIL_PASS}
     changelog:
       enabled: true
       format: markdown
@@ -54,10 +49,11 @@ environments:
       type: release
     storage:
       google_drive:
-        root_folder: "Production Builds"
-        credentials_file: drive-credentials.json
+        folder_url: "https://drive.google.com/drive/folders/REPLACE_WITH_YOUR_FOLDER_ID"
     notifications:
       email:
+        # CI example: use SMTP with environment variables
+        mode: smtp
         to:
           - releases@example.com
           - cto@example.com
@@ -65,7 +61,6 @@ environments:
         smtp_port: 587
         username: ${RF_EMAIL_USER}
         password: ${RF_EMAIL_PASS}
-      slack_webhook: ${RF_SLACK_WEBHOOK}
     changelog:
       enabled: true
       format: markdown
