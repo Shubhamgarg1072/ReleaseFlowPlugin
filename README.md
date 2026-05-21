@@ -72,6 +72,7 @@ The pipeline also generates a changelog from git commits since the last tag.
 - [Headless CI mode](#headless-ci-mode)
 - [Local development](#local-development)
 - [Publishing new versions](#publishing-new-versions-for-maintainers)
+- [Contributing](#contributing)
 - [License](#license)
 
 ---
@@ -465,6 +466,38 @@ releaseflow-plugin/
 ├── sample-app/
 ├── .github/workflows/publish.yml
 └── README.md
+```
+
+---
+
+## Contributing
+
+Contributions are welcome! Please follow the process below:
+
+1. **Fork** the repository
+2. **Create a branch** from `main` for your change:
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+3. **Make your changes** and commit with a clear message
+4. **Open a Pull Request** against `main`
+5. **Wait for review** — the maintainer will review and approve before merging
+
+> The `main` branch is protected. Direct pushes are not allowed — all changes must go through a Pull Request and require at least **1 approval** from the maintainer before they can be merged.
+
+### What to contribute
+
+- Bug fixes
+- New cloud storage provider support
+- New notification channels
+- Documentation improvements
+
+### Local development
+
+```bash
+cd sample-app
+../gradlew releaseFlowValidate
+../gradlew releaseFlowDeployQa -PdryRun=true
 ```
 
 ---
