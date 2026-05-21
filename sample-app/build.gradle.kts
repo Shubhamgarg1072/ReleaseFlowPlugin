@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application") version "8.2.0" apply false
-    id("com.releaseflow.gradle")   // loaded from local composite build (see settings.gradle.kts)
+    id("io.github.Shubhamgarg1072.releaseflow")   // loaded from local composite build (see settings.gradle.kts)
 }
 
 releaseFlow {

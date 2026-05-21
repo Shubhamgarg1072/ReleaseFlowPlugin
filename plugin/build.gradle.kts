@@ -5,8 +5,8 @@ plugins {
     id("com.gradle.plugin-publish") version "1.2.1"
 }
 
-group = "com.releaseflow"
-version = "1.4.1"
+group = "io.github.Shubhamgarg1072"
+version = "1.4.2"
 
 kotlin {
     jvmToolchain(17)
@@ -18,7 +18,7 @@ gradlePlugin {
 
     plugins {
         create("releaseFlow") {
-            id = "com.releaseflow.gradle"
+            id = "io.github.Shubhamgarg1072.releaseflow"
             implementationClass = "com.releaseflow.ReleaseFlowPlugin"
             displayName = "ReleaseFlow"
             description = "Plug-and-play Android release automation: build → rename → upload to Google Drive or OneDrive → email QA via browser. Zero credentials to manage. OAuth one-time sign-in. Free."

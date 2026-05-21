@@ -29,7 +29,7 @@ class ReleaseFlowPluginTest {
         writeFile("settings.gradle.kts", """rootProject.name = "test-project"""")
         writeFile("build.gradle.kts", """
             plugins {
-                id("com.releaseflow.gradle")
+                id("io.github.Shubhamgarg1072.releaseflow")
             }
             releaseFlow {
                 projectName = "TestApp"
@@ -57,7 +57,7 @@ class ReleaseFlowPluginTest {
         writeFile("settings.gradle.kts", """rootProject.name = "test-project"""")
         writeFile("build.gradle.kts", """
             plugins {
-                id("com.releaseflow.gradle")
+                id("io.github.Shubhamgarg1072.releaseflow")
             }
             releaseFlow {
                 projectName = "ValidApp"
@@ -85,7 +85,7 @@ class ReleaseFlowPluginTest {
         writeFile("settings.gradle.kts", """rootProject.name = "test-project"""")
         writeFile("build.gradle.kts", """
             plugins {
-                id("com.releaseflow.gradle")
+                id("io.github.Shubhamgarg1072.releaseflow")
             }
             releaseFlow {
                 environment("qa") { buildType = "debug" }

@@ -5,9 +5,9 @@
 ReleaseFlow automates everything between "build approved" and "QA has the APK link in their inbox":
 **build → rename → upload to Google Drive OR OneDrive → open Gmail compose → done.**
 
-[![Plugin](https://img.shields.io/badge/Gradle%20Plugin-com.releaseflow.gradle-blue)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/packages)
+[![Plugin](https://img.shields.io/badge/Gradle%20Plugin-io.github.Shubhamgarg1072.releaseflow-blue)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/packages)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.4.1-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
+[![Version](https://img.shields.io/badge/Version-1.4.2-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
 
 ---
 
@@ -83,11 +83,11 @@ Just **one line** in `app/build.gradle.kts`:
 ```kotlin
 plugins {
     id("com.android.application")
-    id("com.releaseflow.gradle") version "1.4.1"
+    id("io.github.Shubhamgarg1072.releaseflow") version "1.4.2"
 }
 ```
 
-That's it. No credentials, no maven repo declarations, no PATs. The plugin is hosted on the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.releaseflow.gradle) — `gradlePluginPortal()` is included by default in every Gradle project.
+That's it. No credentials, no maven repo declarations, no PATs. The plugin is hosted on the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.github.Shubhamgarg1072.releaseflow) — `gradlePluginPortal()` is included by default in every Gradle project.
 
 > 💡 **Backup option:** the plugin is also mirrored to GitHub Packages. If you ever need to use the mirror (private fork, etc.), add the GitHub Packages repo to `pluginManagement { repositories { ... } }` with a `read:packages` PAT — but for the official version, Gradle Plugin Portal needs no setup.
 
@@ -380,13 +380,13 @@ cd sample-app
 ```bash
 # 1. Bump version in gradle.properties and plugin/build.gradle.kts
 # 2. Commit and tag
-git commit -am "chore: bump version to v1.4.1"
-git tag v1.4.1
+git commit -am "chore: bump version to v1.4.2"
+git tag v1.4.2
 git push origin main --tags
 ```
 
 GitHub Actions (`.github/workflows/publish.yml`) auto-publishes to:
-- **[Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.releaseflow.gradle)** — the primary, zero-credentials install path for everyone
+- **[Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.github.Shubhamgarg1072.releaseflow)** — the primary, zero-credentials install path for everyone
 - **GitHub Packages** — mirror for private forks or restricted environments
 
 ### One-time Plugin Portal setup (maintainer only)
@@ -401,7 +401,7 @@ The first publish requires API keys from plugins.gradle.org. The whole process i
    - `GRADLE_PUBLISH_SECRET` — the API secret
 5. Push the next `v*` tag — the workflow uses these secrets automatically
 
-> First-time publish of a new plugin id (`com.releaseflow.gradle`) triggers a brief Plugin Portal review (typically a few hours). Subsequent versions of the same plugin publish immediately, with no review.
+> First-time publish of a new plugin id (`io.github.Shubhamgarg1072.releaseflow`) triggers a brief Plugin Portal review (typically a few hours). Subsequent versions of the same plugin publish immediately, with no review.
 
 ### OAuth client setup (one-time per cloud provider, free)
 
