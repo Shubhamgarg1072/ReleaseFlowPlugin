@@ -7,7 +7,7 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 [![Plugin](https://img.shields.io/badge/Gradle%20Plugin-io.github.Shubhamgarg1072.releaseflow-blue)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/packages)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.4.4-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
+[![Version](https://img.shields.io/badge/Version-1.4.5-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
 
 ---
 
@@ -27,12 +27,12 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 ---
 
-## What's new in 1.4.4
+## What's new in 1.4.5
 
 - **Smarter APK naming** — timestamp is appended to the name your build already sets via `applicationVariants.all`, preserving version name and version code:
   `MyApp-release-v3.0.2(123)-20260521-1430.apk`
-- **Version-based Drive folder structure** — APKs are now organised by version instead of year/month:
-  `AppName / release / 3.0.2 / qa /`
+- **Version-based Drive folder structure** — APKs are organised by version name and environment:
+  `AppName / 3.0.2 / qa /`
 
 ---
 
@@ -71,7 +71,7 @@ The pipeline also generates a changelog from git commits since the last tag.
 
 ## Table of Contents
 
-- [What's new in 1.4.4](#whats-new-in-144)
+- [What's new in 1.4.5](#whats-new-in-144)
 - [Installation](#installation)
 - [Configure your environments](#configure-your-environments)
 - [Google Drive vs OneDrive — which to use?](#google-drive-vs-onedrive--which-to-use)
@@ -94,7 +94,7 @@ Just **one line** in `app/build.gradle.kts`:
 ```kotlin
 plugins {
     id("com.android.application")
-    id("io.github.Shubhamgarg1072.releaseflow") version "1.4.4"
+    id("io.github.Shubhamgarg1072.releaseflow") version "1.4.5"
 }
 ```
 
@@ -283,7 +283,7 @@ Folder: My Builds/MyApp/qa/2025/May
 ○ Changelog: reading git history
 ✓ Changelog: 12 commit(s)
 ○ Upload: MyApp-release-v3.0.2(123)-20260521-1430.apk → Google Drive
-✓ Uploaded: MyApp/release/3.0.2/qa
+✓ Uploaded: MyApp/3.0.2/qa
 ○ Email: opening Gmail compose in browser for [qa@company.com, lead@company.com]
 ✓ Gmail compose opened in your browser — review and click Send.
 ▶ ReleaseFlow pipeline complete ✓

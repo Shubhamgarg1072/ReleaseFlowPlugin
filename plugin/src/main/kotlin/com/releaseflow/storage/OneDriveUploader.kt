@@ -149,7 +149,7 @@ class OneDriveUploader {
 
         // Step 2: Ensure release/version/env subfolder hierarchy
         val versionName = extractVersionName(artifact.name)
-        val subSegments = listOf(projectName, "release", versionName, envName)
+        val subSegments = listOf(projectName, versionName, envName)
         val targetFolderId = ensureSubfolders(token, driveId, rootFolderId, subSegments)
         val folderPath = "$rootFolderName/${subSegments.joinToString("/")}"
 

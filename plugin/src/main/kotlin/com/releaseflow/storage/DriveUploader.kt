@@ -37,8 +37,8 @@ class DriveUploader(private val credentialsPath: String) {
     ): UploadResult {
         val service = buildDriveService()
         val versionName = extractVersionName(artifact.name)
-        val folderPath = "$rootFolder/$projectName/release/$versionName/$envName"
-        val folderId = ensureFolderPath(service, listOf(rootFolder, projectName, "release", versionName, envName))
+        val folderPath = "$rootFolder/$projectName/$versionName/$envName"
+        val folderId = ensureFolderPath(service, listOf(rootFolder, projectName, versionName, envName))
 
         val fileMetadata = DriveFile().apply {
             name = artifact.name

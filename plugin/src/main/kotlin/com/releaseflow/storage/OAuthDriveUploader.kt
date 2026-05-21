@@ -127,7 +127,7 @@ class OAuthDriveUploader {
             .build()
 
         val versionName = extractVersionName(artifact.name)
-        val subPath = listOf(projectName, "release", versionName, envName)
+        val subPath = listOf(projectName, versionName, envName)
 
         val rootFolderName = lookupFolderName(service, folderId)
         val folderPath = "$rootFolderName/${subPath.joinToString("/")}"
