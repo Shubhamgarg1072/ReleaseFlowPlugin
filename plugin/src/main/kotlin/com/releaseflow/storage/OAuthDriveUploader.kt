@@ -14,8 +14,6 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.Permission
 import com.google.api.services.drive.model.File as DriveFile
 import java.io.File
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * Uploads files to Google Drive using OAuth 2.0 with a one-time browser sign-in.
@@ -128,9 +126,8 @@ class OAuthDriveUploader {
             .setApplicationName(APPLICATION_NAME)
             .build()
 
-        val now = LocalDateTime.now()
-        val monthName = now.format(DateTimeFormatter.ofPattern("MMMM"))
-        val subPath = listOf(projectName, envName, now.year.toString(), monthName)
+        val versionName = extractVersionName(artifact.name)
+        val subPath = listOf(projectName, "release", versionName, envName)
 
         val rootFolderName = lookupFolderName(service, folderId)
         val folderPath = "$rootFolderName/${subPath.joinToString("/")}"
@@ -166,6 +163,9 @@ class OAuthDriveUploader {
             folderPath = folderPath
         )
     }
+
+    private fun extractVersionName(filename: String): String =
+        Regex("""v(\d+\.\d+(?:\.\d+)*)""").find(filename)?.groupValues?.get(1) ?: "unknown"
 
     private fun lookupFolderName(service: Drive, folderId: String): String =
         try {

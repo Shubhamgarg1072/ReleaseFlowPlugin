@@ -15,9 +15,7 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.file.Files
-import java.time.LocalDateTime
 import java.time.Duration
-import java.time.format.DateTimeFormatter
 import java.util.Base64
 
 /**
@@ -149,10 +147,9 @@ class OneDriveUploader {
         val rootFolderId = sharedFolder["id"].asString
         val rootFolderName = sharedFolder["name"].asString
 
-        // Step 2: Ensure year/month subfolder hierarchy
-        val now = LocalDateTime.now()
-        val monthName = now.format(DateTimeFormatter.ofPattern("MMMM"))
-        val subSegments = listOf(projectName, envName, now.year.toString(), monthName)
+        // Step 2: Ensure release/version/env subfolder hierarchy
+        val versionName = extractVersionName(artifact.name)
+        val subSegments = listOf(projectName, "release", versionName, envName)
         val targetFolderId = ensureSubfolders(token, driveId, rootFolderId, subSegments)
         val folderPath = "$rootFolderName/${subSegments.joinToString("/")}"
 
@@ -179,6 +176,9 @@ class OneDriveUploader {
     }
 
     // ============ Graph REST helpers ============
+
+    private fun extractVersionName(filename: String): String =
+        Regex("""v(\d+\.\d+(?:\.\d+)*)""").find(filename)?.groupValues?.get(1) ?: "unknown"
 
     private fun resolveSharedFolder(token: String, folderUrl: String): JsonObject {
         // Microsoft Graph uses a special URL-safe base64 encoding for sharing URLs.

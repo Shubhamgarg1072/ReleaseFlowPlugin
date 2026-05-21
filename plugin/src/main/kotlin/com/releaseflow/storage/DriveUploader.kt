@@ -10,8 +10,6 @@ import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 import java.io.File
 import java.io.FileInputStream
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * Uploads a file to Google Drive using a Service Account JSON key.
@@ -38,10 +36,9 @@ class DriveUploader(private val credentialsPath: String) {
         envName: String
     ): UploadResult {
         val service = buildDriveService()
-        val now = LocalDateTime.now()
-
-        val folderPath = "$rootFolder/$projectName/$envName/${now.year}/${now.format(DateTimeFormatter.ofPattern("MMMM"))}"
-        val folderId = ensureFolderPath(service, listOf(rootFolder, projectName, envName, now.year.toString(), now.format(DateTimeFormatter.ofPattern("MMMM"))))
+        val versionName = extractVersionName(artifact.name)
+        val folderPath = "$rootFolder/$projectName/release/$versionName/$envName"
+        val folderId = ensureFolderPath(service, listOf(rootFolder, projectName, "release", versionName, envName))
 
         val fileMetadata = DriveFile().apply {
             name = artifact.name
@@ -75,6 +72,9 @@ class DriveUploader(private val credentialsPath: String) {
             folderPath = folderPath
         )
     }
+
+    private fun extractVersionName(filename: String): String =
+        Regex("""v(\d+\.\d+(?:\.\d+)*)""").find(filename)?.groupValues?.get(1) ?: "unknown"
 
     private fun buildDriveService(): Drive {
         val credFile = File(credentialsPath)

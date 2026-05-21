@@ -48,11 +48,11 @@ class ArtifactStep(
 
         Logger.step("Artifact: found ${artifact.name}")
 
-        val newName = buildFilename(artifact.extension)
+        val newName = buildFilename(artifact.nameWithoutExtension, artifact.extension)
         val renamed = File(artifact.parent, newName)
 
         if (dryRun) {
-            Logger.warn("[DRY RUN] Would rename: ${artifact.name} → $newName")
+            Logger.warn("[DRY RUN] Would rename: ${artifact.nameWithoutExtension} → $newName")
             return StepResult.Success(artifact)
         }
 
@@ -61,13 +61,9 @@ class ArtifactStep(
         return StepResult.Success(renamed)
     }
 
-    private fun buildFilename(extension: String): String {
+    private fun buildFilename(artifactName: String, extension: String): String {
         val timestamp = LocalDateTime.now().format(timestampFormatter)
-        val prefix = if (envConfig.flavor.isBlank()) {
-            envConfig.buildType
-        } else {
-            "${envConfig.flavor}-${envConfig.buildType}"
-        }
-        return "$prefix-$timestamp.$extension"
+        val baseName = artifactName.removeSuffix(".$extension")
+        return "$baseName-$timestamp.$extension"
     }
 }
