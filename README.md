@@ -378,51 +378,13 @@ cd sample-app
 
 ## Publishing new versions (for maintainers)
 
+1. Bump the version in both `gradle.properties` and `plugin/build.gradle.kts`
+2. Run:
 ```bash
-# 1. Bump version in gradle.properties and plugin/build.gradle.kts
-# 2. Commit and tag
-git commit -am "chore: bump version to v1.4.3"
-git tag v1.4.3
-git push origin main --tags
+./gradlew publishPlugins
 ```
 
-GitHub Actions (`.github/workflows/publish.yml`) auto-publishes to:
-- **[Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.github.Shubhamgarg1072.releaseflow)** — the primary, zero-credentials install path for everyone
-- **GitHub Packages** — mirror for private forks or restricted environments
-
-### One-time Plugin Portal setup (maintainer only)
-
-The first publish requires API keys from plugins.gradle.org. The whole process is free:
-
-1. Go to https://plugins.gradle.org/ and **Sign in with GitHub**
-2. Open https://plugins.gradle.org/user/me/api-keys → **Generate API key** (give it a name)
-3. Copy the **key** and **secret** that appear (you only see them once)
-4. In your GitHub repo, go to **Settings → Secrets and variables → Actions → New repository secret** and add:
-   - `GRADLE_PUBLISH_KEY` — the API key
-   - `GRADLE_PUBLISH_SECRET` — the API secret
-5. Push the next `v*` tag — the workflow uses these secrets automatically
-
-> First-time publish of a new plugin id (`io.github.Shubhamgarg1072.releaseflow`) triggers a brief Plugin Portal review (typically a few hours). Subsequent versions of the same plugin publish immediately, with no review.
-
-### OAuth client setup (one-time per cloud provider, free)
-
-The plugin ships with pre-configured OAuth Client IDs so end users never see cloud-portal setup. If you're forking the plugin, create your own free clients once:
-
-**For Google Drive (free):**
-1. [console.cloud.google.com](https://console.cloud.google.com) → APIs & Services → Credentials
-2. **Create Credentials → OAuth Client ID → Application type: Desktop App**
-3. Enable the **Google Drive API** in your project
-4. Copy values into `OAuthDriveUploader.kt`
-
-**For OneDrive (free):**
-1. [portal.azure.com](https://portal.azure.com) → Azure Active Directory → App registrations
-2. **New registration** → Supported account types: **Personal Microsoft accounts and any Azure AD directory**
-3. Redirect URI: **Public client/native (mobile & desktop)** → `http://localhost:8989`
-4. API permissions → Add → Microsoft Graph → Delegated → `Files.ReadWrite`, `offline_access`
-5. Copy the **Application (client) ID** into `OneDriveUploader.kt`
-
-> Both portals are completely free. No subscription, no billing setup required.
-> Per [Google](https://developers.google.com/identity/protocols/oauth2/native-app) and [Microsoft](https://learn.microsoft.com/en-us/entra/identity-platform/msal-client-application-configuration), the credentials for Desktop App OAuth clients are not actually secret and can ship with the plugin.
+The plugin is published directly to the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.github.Shubhamgarg1072.releaseflow).
 
 ---
 
