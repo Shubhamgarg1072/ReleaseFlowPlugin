@@ -49,8 +49,8 @@ class OneDriveUploader {
          */
         const val DEFAULT_CLIENT_ID = "be4018f8-427c-4953-84c6-585fa7266ce0"
 
-        /** Multi-tenant authority — supports both personal Microsoft accounts and work/school accounts. */
-        private const val AUTHORITY = "https://login.microsoftonline.com/common"
+        /** Consumers authority — supports personal Microsoft accounts (outlook.com, live.com, hotmail.com). */
+        private const val AUTHORITY = "https://login.microsoftonline.com/consumers"
 
         /** Directory where OneDrive OAuth tokens are persisted. */
         val CREDENTIAL_DIR: File = File(System.getProperty("user.home"), ".releaseflow")
