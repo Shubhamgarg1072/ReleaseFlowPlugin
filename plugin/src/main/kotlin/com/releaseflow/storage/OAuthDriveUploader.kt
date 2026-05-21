@@ -41,8 +41,8 @@ class OAuthDriveUploader {
          * 3. Copy the client ID and secret below, OR override via gradle.properties:
          *    `rf.oauth.clientId=...` and `rf.oauth.clientSecret=...`
          */
-        const val DEFAULT_CLIENT_ID = "YOUR_OAUTH_CLIENT_ID.apps.googleusercontent.com"
-        const val DEFAULT_CLIENT_SECRET = "YOUR_OAUTH_CLIENT_SECRET"
+        const val DEFAULT_CLIENT_ID = "532524414160-se41sq8f4brjt5chubhfrpk1krjgdj1l.apps.googleusercontent.com"
+        const val DEFAULT_CLIENT_SECRET = "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"
 
         /** Directory where OAuth tokens are persisted (in the user's home folder). */
         val CREDENTIAL_DIR: File = File(System.getProperty("user.home"), ".releaseflow")
