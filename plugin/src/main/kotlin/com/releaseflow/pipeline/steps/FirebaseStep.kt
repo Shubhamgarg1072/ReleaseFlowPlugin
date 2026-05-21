@@ -4,6 +4,7 @@ import com.releaseflow.EnvironmentConfig
 import com.releaseflow.pipeline.StepResult
 import com.releaseflow.storage.FirebaseUploader
 import com.releaseflow.util.Logger
+import com.google.gson.JsonParser
 import java.io.File
 
 /**
@@ -23,14 +24,8 @@ class FirebaseStep(
 ) {
 
     fun execute(): StepResult {
-        if (envConfig.firebaseAppId.isBlank()) {
-            return StepResult.Skipped("firebaseAppId not set — skipping Firebase App Distribution")
-        }
         if (envConfig.firebaseServiceAccountJson.isBlank()) {
-            return StepResult.Failure(
-                "firebaseServiceAccountJson is required when firebaseAppId is set\n" +
-                "  → Add the path to your Firebase service account JSON in the environment config"
-            )
+            return StepResult.Skipped("firebaseServiceAccountJson not set — skipping Firebase App Distribution")
         }
 
         val serviceAccountFile = File(projectRootDir, envConfig.firebaseServiceAccountJson)
@@ -41,20 +36,28 @@ class FirebaseStep(
             )
         }
 
+        // Auto-detect app ID from google-services.json if not explicitly set
+        val appId = envConfig.firebaseAppId.ifBlank { readAppIdFromGoogleServices() }
+            ?: return StepResult.Failure(
+                "Could not determine Firebase app ID.\n" +
+                "  → Either set firebaseAppId in your environment config\n" +
+                "  → Or ensure app/google-services.json exists in your project"
+            )
+
         val releaseNotes = buildReleaseNotes()
         val testerSummary = buildTesterSummary()
 
         Logger.step("Firebase: uploading ${artifact.name}${if (testerSummary.isNotBlank()) " → $testerSummary" else ""}")
 
         if (dryRun) {
-            Logger.warn("[DRY RUN] Would upload to Firebase App Distribution (appId: ${envConfig.firebaseAppId})")
+            Logger.warn("[DRY RUN] Would upload to Firebase App Distribution (appId: $appId)")
             return StepResult.Success(Unit)
         }
 
         return try {
             val result = FirebaseUploader(serviceAccountFile.absolutePath).upload(
                 artifact      = artifact,
-                appId         = envConfig.firebaseAppId,
+                appId         = appId,
                 testerEmails  = envConfig.firebaseTesterEmails,
                 groupAliases  = envConfig.firebaseGroups,
                 releaseNotes  = releaseNotes
@@ -69,6 +72,22 @@ class FirebaseStep(
                 "  → Verify Firebase App Distribution is enabled in the Firebase Console",
                 cause = e
             )
+        }
+    }
+
+    private fun readAppIdFromGoogleServices(): String? {
+        val googleServicesFile = File(projectRootDir, "app/google-services.json")
+        if (!googleServicesFile.exists()) return null
+        return try {
+            val json = JsonParser.parseReader(googleServicesFile.reader()).asJsonObject
+            json.getAsJsonArray("client")
+                ?.firstOrNull()
+                ?.asJsonObject
+                ?.getAsJsonObject("client_info")
+                ?.get("mobilesdk_app_id")
+                ?.asString
+        } catch (e: Exception) {
+            null
         }
     }
 
