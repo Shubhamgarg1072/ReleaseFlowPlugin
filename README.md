@@ -29,24 +29,14 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 ## What's new in 1.5.1
 
-- **Firebase App Distribution support** — upload APKs to Firebase and notify testers automatically, alongside Drive/OneDrive upload.
-
----
-
-## What's new in 1.4.9
-
-- **OneDrive support enabled** — zero-config OneDrive login now works out of the box. No Azure setup needed by end users.
-  Run `./gradlew releaseFlowLoginOneDrive` → browser opens → sign in with any Microsoft/Outlook account → done.
-- **Google Drive support** — already worked since v1.0. Run `./gradlew releaseFlowLogin` to sign in.
-
----
-
-## What's new in 1.4.5
-
-- **Smarter APK naming** — timestamp is appended to the name your build already sets via `applicationVariants.all`, preserving version name and version code:
+- **Firebase App Distribution** — upload APKs and notify testers automatically, runs alongside Drive/OneDrive.
+  - App ID is **auto-detected** from `app/google-services.json` — no manual config needed
+  - Just add `firebaseServiceAccountJson` + tester emails and you're done
+  - Release notes auto-populated from git changelog
+- **OneDrive support** — sign in with personal or work Microsoft accounts via `./gradlew releaseFlowLoginOneDrive`
+- **Smart APK naming** — timestamp appended to the name set by `applicationVariants.all`:
   `MyApp-release-v3.0.2(123)-20260521-1430.apk`
-- **Version-based Drive folder structure** — APKs are organised by version name and environment:
-  `AppName / 3.0.2 / qa /`
+- **Version-based folder structure** — `AppName / 3.0.2 / qa /` instead of year/month
 
 ---
 
@@ -75,11 +65,12 @@ When you run `./gradlew releaseFlowDeployQa`:
 
 1. **Builds** the APK / AAB (`assembleQaDebug`)
 2. **Renames** it with a timestamp — `MyApp-release-v3.0.2(123)-20260521-1430.apk`
-3. **Uploads** it to Google Drive or OneDrive (auto-detected from the folder URL) in a `AppName / release / versionName / envName` subfolder
-4. **Opens Gmail compose** in your browser with subject, recipients, download link, and changelog already filled in
-5. **You click Send.** Done.
+3. **Uploads** it to Google Drive or OneDrive (auto-detected from the folder URL) under `AppName / 3.0.2 / qa /`
+4. **Uploads** to Firebase App Distribution and notifies testers (if configured)
+5. **Opens Gmail compose** in your browser with subject, recipients, download link, and changelog already filled in
+6. **You click Send.** Done.
 
-The pipeline also generates a changelog from git commits since the last tag.
+The pipeline auto-generates a changelog from git commits since the last tag.
 
 ---
 
