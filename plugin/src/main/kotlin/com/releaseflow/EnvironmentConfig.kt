@@ -57,7 +57,40 @@ data class EnvironmentConfig(
     var changelogFormat: String = "plain",   // "plain" or "markdown"
 
     // === Slack (optional) ===
-    var slackWebhook: String = ""
+    var slackWebhook: String = "",
+
+    // === Firebase App Distribution (optional) ===
+    /**
+     * Firebase app ID from the Firebase Console (Project Settings → General → Your apps).
+     * Format: `1:PROJECT_NUMBER:android:APP_HASH`
+     * Example: `1:123456789:android:abcdef1234567890`
+     *
+     * When set, the pipeline uploads the artifact to Firebase App Distribution
+     * in addition to (not instead of) the Drive/OneDrive upload.
+     */
+    var firebaseAppId: String = "",
+
+    /**
+     * Path (relative to project root) to a Firebase service account JSON file.
+     * Download from Firebase Console → Project Settings → Service accounts → Generate new private key.
+     * The service account must have the "Firebase App Distribution Admin" role.
+     */
+    var firebaseServiceAccountJson: String = "",
+
+    /** Tester email addresses to notify when a new build is distributed. */
+    var firebaseTesterEmails: List<String> = emptyList(),
+
+    /**
+     * Firebase App Distribution tester group aliases to notify.
+     * Create groups in Firebase Console → App Distribution → Testers & Groups.
+     */
+    var firebaseGroups: List<String> = emptyList(),
+
+    /**
+     * Custom release notes for the Firebase release.
+     * If blank, the git changelog (if enabled) is used automatically.
+     */
+    var firebaseReleaseNotes: String = ""
 ) {
     /**
      * Identifies which cloud provider [driveFolderUrl] points to, by URL pattern.

@@ -2,6 +2,7 @@ package com.releaseflow.pipeline
 
 import com.releaseflow.EnvironmentConfig
 import com.releaseflow.pipeline.steps.*
+import com.releaseflow.pipeline.steps.FirebaseStep
 import com.releaseflow.util.Logger
 import org.gradle.api.GradleException
 import java.io.File
@@ -88,7 +89,16 @@ class ReleasePipeline(
             }
         }
 
-        // Step 4: Email notification
+        // Step 4: Firebase App Distribution
+        if (artifact != null) {
+            when (val result = FirebaseStep(envConfig, artifact, projectRootDir, changelog, dryRun).execute()) {
+                is StepResult.Success<*> -> Unit
+                is StepResult.Skipped   -> Logger.step("Firebase: ${result.reason}")
+                is StepResult.Failure   -> Logger.warn("Firebase upload failed: ${result.message}")
+            }
+        }
+
+        // Step 5: Email notification
         when (val result = NotifyStep(envConfig, projectName, artifact, uploadResult, changelog, dryRun).execute()) {
             is StepResult.Success<*> -> Logger.ok("Email notification sent")
             is StepResult.Skipped -> Logger.warn("Email: ${result.reason}")

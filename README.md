@@ -7,7 +7,7 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 [![Plugin](https://img.shields.io/badge/Gradle%20Plugin-io.github.Shubhamgarg1072.releaseflow-blue)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/packages)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.4.9-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
+[![Version](https://img.shields.io/badge/Version-1.5.0-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
 
 ---
 
@@ -24,6 +24,12 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 | Email sending            | Uses your own Gmail account (no third-party service) |
 
 **No subscriptions. No paid APIs. No credit card needed anywhere.**
+
+---
+
+## What's new in 1.5.0
+
+- **Firebase App Distribution support** — upload APKs to Firebase and notify testers automatically, alongside Drive/OneDrive upload.
 
 ---
 
@@ -79,7 +85,7 @@ The pipeline also generates a changelog from git commits since the last tag.
 
 ## Table of Contents
 
-- [What's new in 1.4.9](#whats-new-in-144)
+- [What's new in 1.5.0](#whats-new-in-144)
 - [Installation](#installation)
 - [Configure your environments](#configure-your-environments)
 - [Google Drive vs OneDrive — which to use?](#google-drive-vs-onedrive--which-to-use)
@@ -87,6 +93,7 @@ The pipeline also generates a changelog from git commits since the last tag.
 - [How the email works](#how-the-email-works)
 - [Usage commands](#usage-commands)
 - [YAML config (optional)](#yaml-config-optional)
+- [Firebase App Distribution](#firebase-app-distribution)
 - [Headless CI mode](#headless-ci-mode)
 - [Local development](#local-development)
 - [Publishing new versions](#publishing-new-versions-for-maintainers)
@@ -102,7 +109,7 @@ Just **one line** in `app/build.gradle.kts`:
 ```kotlin
 plugins {
     id("com.android.application")
-    id("io.github.Shubhamgarg1072.releaseflow") version "1.4.9"
+    id("io.github.Shubhamgarg1072.releaseflow") version "1.5.0"
 }
 ```
 
@@ -347,6 +354,55 @@ environments:
 ```
 
 `${VAR_NAME}` placeholders are resolved from environment variables at build time. The DSL `releaseFlow { }` block always wins when both exist.
+
+---
+
+## Firebase App Distribution
+
+Upload APKs directly to Firebase App Distribution and notify testers — works **alongside** Google Drive/OneDrive, not instead of it.
+
+### Setup (one time)
+
+1. Go to [Firebase Console](https://console.firebase.google.com) → your project → **Project Settings → Service accounts**
+2. Click **Generate new private key** → save the JSON file (e.g. `firebase-service-account.json`)
+3. In Firebase Console → **App Distribution → Testers & Groups** → add tester emails or create groups
+
+### Configuration (`build.gradle.kts`)
+
+```kotlin
+environment("qa") {
+    flavor    = "qa"
+    buildType = "debug"
+
+    // Optional: also upload to Drive
+    driveFolderUrl = "https://drive.google.com/drive/folders/1abc123XYZ"
+
+    // Firebase App Distribution
+    firebaseAppId             = "1:123456789:android:abcdef1234567890"   // from Firebase Console
+    firebaseServiceAccountJson = "firebase-service-account.json"          // relative to project root
+    firebaseTesterEmails      = listOf("qa@company.com", "lead@company.com")
+    firebaseGroups            = listOf("qa-team")                         // optional tester groups
+    // firebaseReleaseNotes   = "Custom notes"                            // optional, defaults to git changelog
+}
+```
+
+### Configuration (`releaseflow.yaml`)
+
+```yaml
+environments:
+  qa:
+    firebase:
+      app_id: "1:123456789:android:abcdef1234567890"
+      service_account_json: firebase-service-account.json
+      tester_emails:
+        - qa@company.com
+        - lead@company.com
+      groups:
+        - qa-team
+      release_notes: ""   # leave blank to use git changelog automatically
+```
+
+> 📋 **Where to find the app ID:** Firebase Console → Project Settings → Your apps → App ID
 
 ---
 

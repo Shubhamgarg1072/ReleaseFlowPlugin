@@ -92,6 +92,14 @@ object YamlConfigReader {
                     config.slackWebhook = resolve(it)
                 }
 
+                // Firebase App Distribution
+                val firebase = envMap["firebase"] as? Map<String, Any>
+                firebase?.get("app_id")?.toString()?.let { config.firebaseAppId = resolve(it) }
+                firebase?.get("service_account_json")?.toString()?.let { config.firebaseServiceAccountJson = resolve(it) }
+                firebase?.get("tester_emails")?.let { config.firebaseTesterEmails = parseRecipients(it) }
+                firebase?.get("groups")?.let { config.firebaseGroups = parseRecipients(it) }
+                firebase?.get("release_notes")?.toString()?.let { config.firebaseReleaseNotes = resolve(it) }
+
                 // Changelog
                 val changelog = envMap["changelog"] as? Map<String, Any>
                 changelog?.get("enabled")?.toString()?.let {
