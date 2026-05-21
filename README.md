@@ -29,7 +29,9 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 ## What's new in 1.4.6
 
-- **OneDrive support enabled** — zero-config OneDrive login now works out of the box. Run `./gradlew releaseFlowLoginOneDrive` and sign in with your Microsoft account.
+- **OneDrive support enabled** — zero-config OneDrive login now works out of the box. No Azure setup needed by end users.
+  Run `./gradlew releaseFlowLoginOneDrive` → browser opens → sign in with any Microsoft/Outlook account → done.
+- **Google Drive support** — already worked since v1.0. Run `./gradlew releaseFlowLogin` to sign in.
 
 ---
 
