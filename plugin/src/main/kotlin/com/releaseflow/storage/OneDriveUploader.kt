@@ -84,7 +84,7 @@ class OneDriveUploader {
         clientId: String = DEFAULT_CLIENT_ID,
         redirectUri: String = DEFAULT_REDIRECT_URI
     ): IAuthenticationResult {
-        if (clientId == DEFAULT_CLIENT_ID || clientId.startsWith("YOUR_")) {
+        if (clientId.startsWith("YOUR_")) {
             throw IllegalStateException(
                 "ReleaseFlow OneDrive client is not configured.\n" +
                 "  → Plugin maintainer: register an app at https://portal.azure.com\n" +

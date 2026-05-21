@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.Shubhamgarg1072"
-version = "1.4.6"
+version = "1.4.7"
 
 kotlin {
     jvmToolchain(17)

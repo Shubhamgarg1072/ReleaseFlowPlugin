@@ -7,7 +7,7 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 [![Plugin](https://img.shields.io/badge/Gradle%20Plugin-io.github.Shubhamgarg1072.releaseflow-blue)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/packages)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.4.6-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
+[![Version](https://img.shields.io/badge/Version-1.4.7-orange)](https://github.com/Shubhamgarg1072/ReleaseFlowPlugin/releases)
 
 ---
 
@@ -27,7 +27,7 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 ---
 
-## What's new in 1.4.6
+## What's new in 1.4.7
 
 - **OneDrive support enabled** — zero-config OneDrive login now works out of the box. No Azure setup needed by end users.
   Run `./gradlew releaseFlowLoginOneDrive` → browser opens → sign in with any Microsoft/Outlook account → done.
@@ -79,7 +79,7 @@ The pipeline also generates a changelog from git commits since the last tag.
 
 ## Table of Contents
 
-- [What's new in 1.4.6](#whats-new-in-144)
+- [What's new in 1.4.7](#whats-new-in-144)
 - [Installation](#installation)
 - [Configure your environments](#configure-your-environments)
 - [Google Drive vs OneDrive — which to use?](#google-drive-vs-onedrive--which-to-use)
@@ -102,7 +102,7 @@ Just **one line** in `app/build.gradle.kts`:
 ```kotlin
 plugins {
     id("com.android.application")
-    id("io.github.Shubhamgarg1072.releaseflow") version "1.4.6"
+    id("io.github.Shubhamgarg1072.releaseflow") version "1.4.7"
 }
 ```
 
