@@ -47,7 +47,7 @@ class OneDriveUploader {
          * 4. Copy the **Application (client) ID** below, OR override via gradle.properties:
          *    `rf.onedrive.clientId=...`
          */
-        const val DEFAULT_CLIENT_ID = "YOUR_AZURE_CLIENT_ID"
+        const val DEFAULT_CLIENT_ID = "be4018f8-427c-4953-84c6-585fa7266ce0"
 
         /** Multi-tenant authority — supports both personal Microsoft accounts and work/school accounts. */
         private const val AUTHORITY = "https://login.microsoftonline.com/common"
