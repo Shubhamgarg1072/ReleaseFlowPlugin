@@ -27,6 +27,15 @@ ReleaseFlow automates everything between "build approved" and "QA has the APK li
 
 ---
 
+## What's new in 1.4.4
+
+- **Smarter APK naming** — timestamp is appended to the name your build already sets via `applicationVariants.all`, preserving version name and version code:
+  `MyApp-release-v3.0.2(123)-20260521-1430.apk`
+- **Version-based Drive folder structure** — APKs are now organised by version instead of year/month:
+  `AppName / release / 3.0.2 / qa /`
+
+---
+
 ## The 3-step setup
 
 ```bash
@@ -51,8 +60,8 @@ That's it. No service-account JSON. No App Passwords. No folder sharing.
 When you run `./gradlew releaseFlowDeployQa`:
 
 1. **Builds** the APK / AAB (`assembleQaDebug`)
-2. **Renames** it with a timestamp — `qa-debug-20250519-1430.apk`
-3. **Uploads** it to Google Drive or OneDrive (auto-detected from the folder URL) in a `Project / Env / Year / Month` subfolder
+2. **Renames** it with a timestamp — `MyApp-release-v3.0.2(123)-20260521-1430.apk`
+3. **Uploads** it to Google Drive or OneDrive (auto-detected from the folder URL) in a `AppName / release / versionName / envName` subfolder
 4. **Opens Gmail compose** in your browser with subject, recipients, download link, and changelog already filled in
 5. **You click Send.** Done.
 
@@ -62,6 +71,7 @@ The pipeline also generates a changelog from git commits since the last tag.
 
 ## Table of Contents
 
+- [What's new in 1.4.4](#whats-new-in-144)
 - [Installation](#installation)
 - [Configure your environments](#configure-your-environments)
 - [Google Drive vs OneDrive — which to use?](#google-drive-vs-onedrive--which-to-use)
@@ -269,11 +279,11 @@ Folder: My Builds/MyApp/qa/2025/May
 ○ Build: assembleQaDebug
 ✓ Build completed
 ○ Artifact: locating output APK/AAB
-✓ Artifact renamed to: qa-debug-20250519-1430.apk
+✓ Artifact renamed to: MyApp-release-v3.0.2(123)-20260521-1430.apk
 ○ Changelog: reading git history
 ✓ Changelog: 12 commit(s)
-○ Upload: qa-debug-20250519-1430.apk → Google Drive
-✓ Uploaded: My Builds/MyApp/qa/2025/May
+○ Upload: MyApp-release-v3.0.2(123)-20260521-1430.apk → Google Drive
+✓ Uploaded: MyApp/release/3.0.2/qa
 ○ Email: opening Gmail compose in browser for [qa@company.com, lead@company.com]
 ✓ Gmail compose opened in your browser — review and click Send.
 ▶ ReleaseFlow pipeline complete ✓
