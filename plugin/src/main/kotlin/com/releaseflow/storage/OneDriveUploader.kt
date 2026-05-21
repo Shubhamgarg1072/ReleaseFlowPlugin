@@ -47,10 +47,10 @@ class OneDriveUploader {
          * 4. Copy the **Application (client) ID** below, OR override via gradle.properties:
          *    `rf.onedrive.clientId=...`
          */
-        const val DEFAULT_CLIENT_ID = "be4018f8-427c-4953-84c6-585fa7266ce0"
+        const val DEFAULT_CLIENT_ID = "92c6f0f7-4477-4b39-91ab-b791a4119bb1"
 
-        /** Consumers authority — supports personal Microsoft accounts (outlook.com, live.com, hotmail.com). */
-        private const val AUTHORITY = "https://login.microsoftonline.com/consumers"
+        /** Common authority — supports both personal Microsoft accounts and work/school Azure AD accounts. */
+        private const val AUTHORITY = "https://login.microsoftonline.com/common"
 
         /** Directory where OneDrive OAuth tokens are persisted. */
         val CREDENTIAL_DIR: File = File(System.getProperty("user.home"), ".releaseflow")
